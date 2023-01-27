@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>[vue0~1]基础知识篇案例参考 （data 与 methods）</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+
+<div>这是在vue管理的实例之外的内容区域</div>
+
+<h2>1、data选项使用:</h2>
+<hr/>
+<div id="app">
+    <!--#app内的区域将作为一个vue实例的掌管区域-->
+
+    <!--在标签内使用vue中的数据或者函数可使用"{{}}"双花括号进行包裹，花括号内的内容会被vue进行接管替换，并且this指向当前区域对应的vue实例-->
+    <div>{{this.message}}</div>
+
+    <!--由于我们会经常使用到实例的数据，vue为我们的省略this，直接写message也是可以的-->
+    <div>{{message}}</div>
+</div>
+<script>
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                message: "这是自动响应的数据"
+            }
+        }
+    })
+</script>
+
+<h2>2、methods选项使用</h2>
+<hr/>
+
+<div id="action">
+    <div>{{msg}}{{timeMsg}}</div>
+    <div>
+        <!-- v- 开头的都是vue的指令包含内置指令、自定义指令-->
+        <!-- v-on: 给元素绑定事件监听器。文档参考：https://v2.cn.vuejs.org/v2/api/#v-on-->
+        <!-- v-on:click 给元素绑定点击事件监听器。-->
+        <!-- v-on:click="setTime" 给元素绑定点击事件监听器，触发后调用vue实例的方法，方法需要在methods选项中创建。-->
+        <button v-on:click="setTime">设置当前时间戳</button>
+        <!-- 由于v-on经常使用，官方提供了简写"@"符号。-->
+        <!-- 时间触发后应该传入一个函数，函数如果不需要特殊的参数则可省略()，如果需要自定义参数，则可如changeMsg('时间：','00:00')的形式进行传入-->
+        <!-- v-on (@)修饰后的事件属性的值接收的是js语法的函数，也可写行内的箭头函数-->
+        <button @mouseup="changeMsg('时间：','00:00')">改变提示文本内容</button>
+        <button @click="reset">还原数据</button>
+    </div>
+</div>
+<script>
+    const defaultMsg = "默认内容："
+    new Vue({
+        el: "#action",
+        data() {
+            return {
+                msg: defaultMsg,
+                timeMsg: "",
+            }
+        },
+        methods: {
+            changeMsg(newMsg, timeMsg = "") { // 接收用户输入的变量值
+                this.msg = newMsg;
+            },
+            setTime() {
+                this.timeMsg = String(Date.now())
+            },
+            reset(event) {
+                // 默认传入的 Event
+                this.msg = defaultMsg;
+                this.timeMsg = "";
+            }
+        }
+    })
+</script>
+
+
+<h2>3、input的数据双向绑定实例</h2>
+<hr/>
+
+<div id="input">
+    <div>
+        <!-- v-bind: 给元素的属性绑定数据 参考文档：https://v2.cn.vuejs.org/v2/api/#v-bind -->
+        <!-- 通过@input给input元素绑定input事件，可以监听到input的用户输入值的变化 -->
+        <input v-bind:value="value" @input="onChange"/>
+        <!-- 由于v-bind经常使用，官方提供了简写":"符号。-->
+        <input :value="value" @input="onChange"/>
+    </div>
+    <div>
+        <button @click="onClear">清空input的值</button>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: "#input",
+        data() {
+            return {
+                value: "默认值",
+            }
+        },
+        methods: {
+            onChange(inputEvent) {
+                // 取到当前input的文本值，并设置到当前vue实例value上
+                this.value = inputEvent.target.value
+            },
+            // 清空数据
+            onClear() {
+                this.value = ""
+            }
+        }
+    })
+</script>
+
+
+<h2>4、使用v-model指令实现数据的双向绑定</h2>
+<hr/>
+
+<div id="model">
+    <div>
+        <h3 v-html="value">{{value}}</h3>
+        <!-- v-model: 在表单控件或者组件上创建双向绑定(即是上例的快捷写法) 参考文档：https://v2.cn.vuejs.org/v2/api/#v-model -->
+        <input v-model="value"/>
+    </div>
+    <div>
+        <button @click="onClear">清空input的值</button>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: "#model",
+        data() {
+            return {
+                value: "默认值",
+            }
+        },
+        methods: {
+            // 清空数据
+            onClear() {
+                this.value = ""
+            }
+        }
+    })
+</script>
+
+
+<h2>5、使用v-html指令显示html片段代码</h2>
+<hr/>
+
+<div id="html">
+    <div>
+        <!-- 原样输出 -->
+        <div>{{value}}</div>
+        <!-- v-html解析字符串中的html标签，显示html片段 -->
+        <div v-html="value"></div>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: "#html",
+        data() {
+            return {
+                value: "<h4 style='color:red'>这是一段红色的标题4的文字</h4>",
+            }
+        },
+    })
+</script>
+
+<h2>6、使用v-show和v-if等条件判断指令的使用</h2>
+<hr/>
+
+<div id="if">
+    <div>
+        <div v-show="show">这是使用v-show控制的，隐藏后，该div依然是渲染的</div>
+        <div v-if="show">这是使用v-if控制的，隐藏后，该div就不渲染了</div>
+
+        <div style="color:red">下列演示v-if、v-else-if、v-else：</div>
+        <div>当前值：{{value}}</div>
+        <div v-if="value===0">值为0时显示该条文字</div>
+        <div v-else-if="value===1">值为1时显示该条文字</div>
+        <div v-else-if="value===2">值为2时显示该条文字</div>
+        <div v-else-if="value===3">值为3时显示该条文字</div>
+        <div v-else>值大于3时显示该条文字</div>
+
+    </div>
+    <div>
+        <!-- 在 v- 指令修饰的属性值里不仅仅可以使用methods种的函数或者data中的数据，也可以写简单的单行js语句 -->
+        <!-- 比如下列注释中 v-on (@) 修饰的click的箭头函数语法 -->
+        <!-- <button @click="()=>show=!show">显示隐藏元素</button> -->
+        <!-- 简写的形式变种如下直接设置 this.show=!this.show -->
+        <button @click="show=!show">显示/隐藏元素</button>
+        <button @click="value++">value+1</button>
+        <button @click="value=0">重置value为0</button>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: "#if",
+        data() {
+            return {
+                show: true,
+                value: 0,
+            }
+        },
+    })
+</script>
+
+
+<h2>7、使用v-for指令进行数据的遍历显示</h2>
+<hr/>
+
+<div id="for">
+    <div>
+        <template v-for="(value,index) in data">
+            <div v-if="value>0" :key="value">
+                仅显示value大于0的值：index=>{{index}}，value=>{{value}}
+            </div>
+        </template>
+
+    </div>
+</div>
+<script>
+    new Vue({
+        el: "#for",
+        data() {
+            return {
+                data: [0, 1, 2, 3],
+            }
+        },
+    })
+</script>
+
+<h2>8、v-on的修饰符补充</h2>
+<hr/>
+
+<div id="event">
+    <div>
+        <div style="color: red">.stop禁止事件冒泡(分别点击下列的区域)</div>
+        <div class="event-wrap">
+            <div class="event-child"></div>
+        </div>
+
+    </div>
+</div>
+<script>
+    new Vue({
+        el: "#event",
+        data() {
+            return {
+                wrapChecked: false,
+                childChecked: false,
+            }
+        },
+        computed: {
+            wrapClass() {
+                const names = ['event-wrap'];
+                return names;
+            }
+        },
+        methods: {
+            onClickWrap() {
+                this.wrapChecked = true
+            },
+            onClickChild() {
+                this.childChecked = true
+            },
+        }
+    })
+</script>
+<style>
+    .event-wrap {
+        width: 100px;
+        height: 100px;
+        background: aqua;
+        cursor: pointer;
+
+    }
+
+    .event-child {
+        width: 50px;
+        height: 50px;
+        background: antiquewhite;
+        cursor: pointer
+    }
+</style>
+</body>
+</html>
+
