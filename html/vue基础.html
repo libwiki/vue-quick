@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>[vue0~1]基础知识篇案例参考 （data 与 methods）</title>
+    <title>[Vue速成]基础知识篇案例参考 （data 与 methods）</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 </head>
 <body>
@@ -209,7 +209,7 @@
 </script>
 
 
-<h2>7、使用v-for指令进行数据的遍历显示</h2>
+<h2>9、使用v-for指令进行数据的遍历显示</h2>
 <hr/>
 
 <div id="for">
@@ -233,14 +233,150 @@
     })
 </script>
 
-<h2>8、v-on的修饰符补充</h2>
+<h2>10、v-bind的补充与计算属性computed选项的使用</h2>
 <hr/>
 
+<div id="computed">
+    <div>
+        <div style="font-weight: bold">1、v-bind绑定的属性值是可以简写简单的js语法的，如下通过三种形式设置类样式：</div>
+        <div :class="`wrap-bg ${isChecked?'checked':''}`">v-bind:class=`wrap-bg ${isChecked?'checked':''}`字符串的形式
+        </div>
+        <div :class="['wrap-bg',isChecked?'checked':'']">v-bind:class=['wrap-bg',isChecked?'checked':'']数组的形式</div>
+        <div :class="{'wrap-bg':true}">v-bind:class={"wrap-bg":true}对象形式</div>
+
+        <div style="font-weight: bold">2、v-bind绑定的style，可通过如下的对象的形式进行设置：</div>
+        <div :style="{background:'red',color:'white',margin:'10px'}">
+            v-bind:style="{background:'red',color:'white',margin:'10px'}"设置红色背景，白色的字体和10px填充
+        </div>
+        <div style="font-weight: bold">3、计算属性computed的应用：</div>
+        <div>{{wrapClassMessage}}</div>
+        <div @mousedown="onWrapDown" @mouseup="onWrapUp" :class="wrapClass">
+            长按看效果
+        </div>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: "#computed",
+        data() {
+            return {
+                isChecked: false
+            }
+        },
+        computed: { // 计算属性选项
+            /**
+             * 1、计算属性可以，可以想相应数据data一样直接通过this.*直接引用
+             * 2、计算属性内部一般都会依赖于某一个或者多个data相应数据（或props数据）后扩展生成的
+             * 3、计算属性一般是缓存在内存中，仅当依赖的数据发生变化时才会重新组合
+             * @returns {string[]}
+             */
+            wrapClass() {
+                const classNames = ['computed-wrap'];
+                if (this.isChecked) { // 比如此处的wrapClass依赖了this.isChecked，当this.isChecked发生变化时，该计算属性会自动的生成新的值
+                    classNames.push('checked')
+                }
+                return classNames;
+            },
+            // 计算属性不仅仅可以依赖data,也能同时依赖其他的computed或者props(props后续会讲到，本章节暂时忽略)
+            wrapClassMessage() {
+                return `当前的类样式为：${this.wrapClass.join(' ')}`
+            }
+        },
+        methods: {
+            // 鼠标按下，设置选中状态为真
+            onWrapDown() {
+                this.isChecked = true
+            },
+            // 鼠标抬起，设置选中状态为假
+            onWrapUp() {
+                this.isChecked = false
+            },
+
+        }
+    })
+</script>
+<style>
+
+    .wrap-bg {
+        background: coral;
+        color: white;
+        margin: 5px 0;
+    }
+
+    .computed-wrap {
+        width: 100px;
+        height: 100px;
+        background: aqua;
+        cursor: pointer;
+
+    }
+
+    .computed-wrap.checked {
+        background: coral;
+    }
+</style>
+
+<h2>11、使用```watch```选项进行数据的监听</h2>
+<hr/>
+<div id="watch">
+    <div>
+        <div style="font-weight: bold">1、v-bind绑定的属性值是可以简写简单的js语法的，如下通过三种形式设置类样式：</div>
+        <div>num的值：{{num}}</div>
+        <div>计算属性powNum的值：{{powNum}}</div>
+    </div>
+    <div>
+        <button @click="onPlus">num++</button>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: "#watch",
+        data() {
+            return {
+                num: 0
+            }
+        },
+        computed: { // 计算属性选项
+            powNum() {
+                return Math.pow(this.num, 2);
+            },
+        },
+        watch: {
+            // 监听data数据的变化
+            num(newValue, oldValue) {
+                console.log(`num：${oldValue} => ${newValue}`)
+            },
+            // 也可以监听计算属性的变化
+            powNum(newValue, oldValue) {
+                console.log(`powNum由：${oldValue} => ${newValue}`)
+            }
+        },
+        methods: {
+            onPlus() {
+                this.num++
+            },
+        }
+    })
+</script>
+
+<h2>12、v-on的修饰符补充 </h2>
+<hr/>
 <div id="event">
     <div>
-        <div style="color: red">.stop禁止事件冒泡(分别点击下列的区域)</div>
-        <div class="event-wrap">
-            <div class="event-child"></div>
+        <div style="color: red">1、默认存在事件冒泡时(点击小框，大框也会接收到点击事件)</div>
+        <div @mousedown="onWrapDown" @mouseup="onWrapUp" :class="wrapClass">
+            <div @mousedown="onChildDown" @mouseup="onChildUp" :class="childClass">
+                长按看效果
+            </div>
+        </div>
+
+        <div style="color: red">.stop禁止事件冒泡（点击小框，大框并不会收到点击事件）</div>
+        <div>wrapClass: {{wrapClass}}</div>
+        <div>childClass: {{childClass}}</div>
+        <div @mousedown="onWrapDown" @mouseup="onWrapUp" :class="wrapClass">
+            <div @mousedown.stop="onChildDown" @mouseup.stop="onChildUp" :class="childClass">
+                长按看效果
+            </div>
         </div>
 
     </div>
@@ -250,23 +386,46 @@
         el: "#event",
         data() {
             return {
-                wrapChecked: false,
-                childChecked: false,
+                wrapChecked: false, // 是否按下大框
+                childChecked: false, // 是否按下小框
             }
         },
         computed: {
+            // 大框使用的类名
             wrapClass() {
                 const names = ['event-wrap'];
+                if (this.wrapChecked) { // 当按下时大框附加.checked
+                    names.push('checked')
+                }
                 return names;
-            }
+            },
+            // 小框使用的类名
+            childClass() {
+                const names = ['event-child'];
+                if (this.childChecked) { // 当按下时小框框附加.checked
+                    names.push('checked')
+                }
+                return names;
+            },
+
         },
         methods: {
-            onClickWrap() {
+            // 按下大框
+            onWrapDown() {
                 this.wrapChecked = true
             },
-            onClickChild() {
+            // 按下小框
+            onChildDown() {
                 this.childChecked = true
             },
+            // 鼠标从大框抬起
+            onWrapUp() {
+                this.wrapChecked = false
+            },
+            // 鼠标从小框抬起
+            onChildUp() {
+                this.childChecked = false
+            }
         }
     })
 </script>
@@ -284,6 +443,14 @@
         height: 50px;
         background: antiquewhite;
         cursor: pointer
+    }
+
+    .event-wrap.checked {
+        background: darkturquoise;
+    }
+
+    .event-child.checked {
+        background: coral;
     }
 </style>
 </body>
