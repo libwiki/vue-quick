@@ -316,11 +316,11 @@
     }
 </style>
 
-<h2>11、使用```watch```选项进行数据的监听</h2>
+<h2>11、使用watch选项进行数据的监听</h2>
 <hr/>
 <div id="watch">
     <div>
-        <div style="font-weight: bold">1、v-bind绑定的属性值是可以简写简单的js语法的，如下通过三种形式设置类样式：</div>
+        <div style="font-weight: bold">打开控制台，然后点击下列"num++"按钮，查看输出的监听到的值的变化效果</div>
         <div>num的值：{{num}}</div>
         <div>计算属性powNum的值：{{powNum}}</div>
     </div>
@@ -453,6 +453,48 @@
         background: coral;
     }
 </style>
+
+
+<h2>13、ref和$nextTick的使用参考</h2>
+<hr/>
+<div id="ref">
+    <div>
+        <div style="font-weight: bold">打开控制台，然后点击下列"num++"按钮，查看输出的num值是否统一</div>
+        <div>
+            num的值：
+            <!-- 给span设置一个ref引用，名为：numSpan -->
+            <span ref="numSpan" style="color: red">{{num}}</span>
+        </div>
+    </div>
+    <div>
+        <button @click="onPlus">num++</button>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: "#ref",
+        data() {
+            return {
+                num: 0
+            }
+        },
+        methods: {
+            onPlus() {
+                this.num++
+                console.log("==================分割线=====================")
+                console.log('当前的num数据：', this.num)
+                // 通过this.$refs获取实例上的所有ref引用（此处输出的内容是正确的，是因为numSpan是引用类型）
+                console.log('numSpan：', this.$refs.numSpan)
+                // 取到名为：numSpan的引用后就可以获取他的属性了（这里输出的内容还是就的值是因为，取出innerText的时期，界面还未重新渲染完成）
+                console.log('当前界面上的实际内容：', this.$refs.numSpan.innerText)
+                this.$nextTick(() => {
+                    console.log('$nextTick重新渲染完成后的文本内容：', this.$refs.numSpan.innerText)
+                })
+
+            },
+        }
+    })
+</script>
 </body>
 </html>
 
