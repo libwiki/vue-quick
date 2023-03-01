@@ -1,7 +1,7 @@
 # Vue速成系列目录
 
-* [1、Vue基础](./docx/1.vue基础.md)
-* 2、npm包管理器
+* [1、Vue基础](docs/1.vue基础.md)
+* [2、npm包管理](docs/2、npm包管理.md)
 * 3、vite-vue脚手架
 * 4、vue单文件组件
 * 5、vue自定义指令
